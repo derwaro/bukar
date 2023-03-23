@@ -161,7 +161,7 @@ def calendarview(request):
                     # print(f"found! {oslot[0]}")
                     oslot[1][1] = "blocked"
 
-    return render(request, "appointment/calendarview.html", {"event_list": slots})
+    return render(request, "appointment/calendarview.html", {"slots": slots})
 
 
 """

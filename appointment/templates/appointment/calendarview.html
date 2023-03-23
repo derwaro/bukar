@@ -2,5 +2,22 @@
 
 {% block content %}
 <h1>Calendar for Appointments</h1>
-<p>{{event_list}}</p>
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            {% for day in slots.keys %}
+                <th>{{ day|date:"D" }}, {{ day|date:"d.m.Y" }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+<tbody>
+{% for slot in slots.values %}
+    <tr>
+        <td>{{ slot }} </td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+
 {% endblock content %}
