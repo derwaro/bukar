@@ -1,0 +1,19 @@
+<!-- choose_treatments.html -->
+{% extends "appointment/base.html" %}
+
+{% block content %}
+<h1>Choose your desired treatments:</h1>
+
+
+<form method="post">
+{% csrf_token %}
+{% for field in form %}
+<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+{{ field }}
+{% endfor %}
+<button type="button" hx-get="{% url 'add_choose_treatment' %}" hx-target="#extra-field" hx-swap="afterbegin" hx-trigger="click" hx-boost=".hide-button">Add treatment</button>
+<div id="extra-field"></div>
+<button type="submit">Next</button>
+</form>
+
+{% endblock content %}

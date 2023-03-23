@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}Default Title{% endblock %}</title>
+    {% load static %}
+<script src="{% static 'js/htmx.min.js' %}" defer></script>
+<link href="{% static 'css/custom.css' %}" type="text/css" rel="stylesheet" /> 
+</head>
+  <body>
+    <header>
+      <h1>{% block heading %}Default Heading{% endblock %}</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+    </nav>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+      <p>&copy; {{ year }} My Website</p>
+    </footer>
+  </body>
+</html>

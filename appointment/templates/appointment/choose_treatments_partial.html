@@ -1,0 +1,14 @@
+<input hx-swap-oob="true" 
+       type="hidden" 
+       name="form-TOTAL_FORMS" 
+       value="{{ new_total_formsets }}" 
+       id="id_form-TOTAL_FORMS">
+
+<p>{{ new_formset }}</p>
+
+<button type="button" 
+        hx-trigger="click"
+        hx-get="{% url 'add_formset' new_total_formsets %}"  
+        hx-swap="outerHTML">
+  Add formset
+</button>
