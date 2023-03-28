@@ -1,23 +1,68 @@
 <!-- calendarview.html -->
+{% extends "appointment/base.html" %}
 
 {% block content %}
-<h1>Calendar for Appointments</h1>
+<!--
 <table>
-    <thead>
-        <tr>
-            <th>Time</th>
-            {% for day in slots.keys %}
-                <th>{{ day|date:"D" }}, {{ day|date:"d.m.Y" }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-<tbody>
-{% for slot in slots.values %}
+  <thead>
     <tr>
-        <td>{{ slot }} </td>
+      {% for date in calendar %}
+        <th>{{ date }}</th>
+      {% endfor %}
     </tr>
-{% endfor %}
-</tbody>
+  </thead>
+  <tbody>
+    {% for day, slots in calendar.items %}
+      <tr>
+        {% for slot, details in slots.items %}
+          <td>{{ details.start }} - {{ details.end }}{% if not details.available %} (Blocked){% endif %}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
+-->
+{% for date in calendar %}
+<table>
+  <thead>
+    <tr>
+      <th>{{date}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slots in calendar.values %}
+    {% for slot in slots.values %}
+    {% if slot.start|date:"Y-m-d" == date %}
+    
+    {% if slot.available == "True" %}
+        <div class="bg-green-500">
+      {% else %}
+        <div class="bg-red-500">
+      {% endif %}
+    <tr>
+      
+      <td  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}" >{{slot.start|date:"H:i"}} - {{ slot.available }}</td>
+    </tr>
+  </div>
+
+    {% endif %}
+
+    
+    
+        
+      {% endfor %}
+    {% endfor %}
+      
+        
+  </tbody>
+</table>  
+{% endfor %}
+  
+
+<button class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+  Button
+</button>
+
+
 
 {% endblock content %}

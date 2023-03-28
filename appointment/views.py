@@ -95,11 +95,11 @@ def calendarview(request):
     service = setup_service()
     timeMin = datetime.now().astimezone(cdmx)
     timeMin_iso = timeMin.isoformat()
-    timeMax = timeMin + timedelta(days=7)
+    timeMax = timeMin + timedelta(days=2)
     timeMax_iso = timeMax.isoformat()
 
     day_start = datetime.strptime("08:00", "%H:%M")
-    day_end = datetime.strptime("18:00", "%H:%M")
+    day_end = datetime.strptime("10:00", "%H:%M")
 
     slot_duration = timedelta(minutes=15)
 
@@ -118,7 +118,7 @@ def calendarview(request):
         return HttpResponse(event_list)
 
     # print(events)
-
+    """
     # prepare blocked slots according to data fetched from calendar API
     blocked_slots = []
     for event in events:
@@ -146,12 +146,19 @@ def calendarview(request):
         curr_day_end = curr_day_end.replace(tzinfo=cdmx)
 
         slots[curr_day_start] = []
+        counter = 0
 
         while curr_slot < curr_day_end:
+
             curr_slot = curr_slot.replace(tzinfo=cdmx)
-            tmp = [curr_slot, ["available", curr_slot, curr_slot + slot_duration, 0]]
+            tmp = [
+                curr_slot,
+                counter,
+                ["available", curr_slot, curr_slot + slot_duration, 0],
+            ]
             slots[curr_day_start].append(tmp)
             curr_slot += slot_duration
+            counter += 1
 
     # consolidate blocked_slots and slots into result
     for bslot in blocked_slots:
@@ -159,145 +166,69 @@ def calendarview(request):
             for oslot in slots[bslot[0].date()]:
                 if bslot[0] == oslot[0]:
                     # print(f"found! {oslot[0]}")
-                    oslot[1][1] = "blocked"
+                    oslot[2][1] = "blocked"
 
-    return render(request, "appointment/calendarview.html", {"slots": slots})
+    dates = []
+    for day, values in slots.items():
+        for value in values:
+            dates.append(value)
 
-
-"""
-def calendarview(request):
-    service = setup_service()
-    timeMin = datetime.now().astimezone(cdmx)
-    timeMin_iso = timeMin.isoformat()
-    timeMax = timeMin + timedelta(days=7)
-    timeMax_iso = timeMax.isoformat()
-
-    day_start = datetime.strptime("08:00", "%H:%M")
-    day_end = datetime.strptime("16:00", "%H:%M")
-
-    events_results = (
-        service.events()
-        .list(
-            calendarId=cid,
-            timeMax=timeMax_iso,
-            timeMin=timeMin_iso,
-        )
-        .execute()
-    )
-    events = events_results.get("items", [])
-    if not events:
-        event_list = []
-        return HttpResponse(event_list)
-
+    l = []
+    for i in slots.values():
+        l.append(i)
+    l = len(l[0])
+    iterator = range(0, l)
     """
-"""
-    event_list = []
+    # prepare blocked slots according to data fetched from calendar API
+    blocked_slots = []
+    for event in events:
+        slot_start = parse(event["start"]["dateTime"])
+        slot_end = parse(event["end"]["dateTime"])
+        curr_slot = slot_start
+        while curr_slot < slot_end:
+            curr_slot = curr_slot.replace(tzinfo=cdmx)
+            tmp = [curr_slot, ["blocked", curr_slot, curr_slot + slot_duration, 0]]
+            blocked_slots.append(tmp)
+            curr_slot += slot_duration
+
+    for slot in blocked_slots:
+        slot[1][3] = blocked_slots.count(slot)
+
+    # prepare all possible slots for the next seven days
+    slots = {}
     for day in range(0, 8):
-        date = (timeMin + timedelta(days=day)).date()
-        tmp = []
-        for e in events:
-            if parse(e["start"]["dateTime"]).date() == date:
-                start = datetime.strptime(e["start"]["dateTime"], "%Y-%m-%dT%H:%M:%S%z")
-                end = datetime.strptime(e["end"]["dateTime"], "%Y-%m-%dT%H:%M:%S%z")
-                tz_start = pytz.FixedOffset(start.utcoffset().total_seconds() // 60)
-                tz_end = pytz.FixedOffset(end.utcoffset().total_seconds() // 60)
-                start = start.replace(tzinfo=tz_start)
-                end = end.replace(tzinfo=tz_end)
-                tmp.append(["blocked", start, end])
-                # events.pop(e)
-        event_list.append({date: tmp})
-"""
-"""
-    event_list = []
-    slot_size = 15  # slot size in minutes
-    for day in range(0, 8):
-        date = (timeMin + timedelta(days=day)).date()
-        tmp = []
-        for e in events:
-            if parse(e["start"]["dateTime"]).date() == date:
-                start = datetime.strptime(e["start"]["dateTime"], "%Y-%m-%dT%H:%M:%S%z")
-                end = datetime.strptime(e["end"]["dateTime"], "%Y-%m-%dT%H:%M:%S%z")
-                tz_start = pytz.FixedOffset(start.utcoffset().total_seconds() // 60)
-                tz_end = pytz.FixedOffset(end.utcoffset().total_seconds() // 60)
-                start = start.replace(tzinfo=tz_start)
-                end = end.replace(tzinfo=tz_end)
+        curr_day_start = timeMin.date() + timedelta(days=day)
+        curr_day = curr_day_start.strftime("%Y-%m-%d")
+        slots[curr_day] = {}
 
-                # split up existing appointments into 15 minutes slots.
-                slots = []
-                curr_slot_start = start
+        curr_slot = datetime.combine(curr_day_start, day_start.time())
+        curr_slot = curr_slot.replace(tzinfo=cdmx)
 
-                while curr_slot_start < end:
-                    curr_slot_end = curr_slot_start + timedelta(minutes=slot_size)
-                    slots.append(["blocked", curr_slot_start, curr_slot_end])
-                    curr_slot_start = curr_slot_end
-                tmp.extend(slots)
-        event_list.append({date: tmp})
+        curr_day_end = datetime.combine(curr_day_start, day_end.time())
+        curr_day_end = curr_day_end.replace(tzinfo=cdmx)
 
-    # print(event_list)
+        slot_num = 1
+        while curr_slot < curr_day_end:
+            curr_slot = curr_slot.replace(tzinfo=cdmx)
+            tmp = {
+                "start": curr_slot,
+                "end": curr_slot + slot_duration,
+                "available": True,
+            }
+            for bslot in blocked_slots:
+                if bslot[1][3] >= 2 and bslot[0] == curr_slot:
+                    tmp["available"] = False
+                    tmp["status"] = "blocked"
+                    break
 
-    # Define the start and end times of your schedule
-
-    start_time = time(hour=9, minute=0, tzinfo=pytz.FixedOffset(-360))
-    end_time = time(hour=17, minute=0, tzinfo=pytz.FixedOffset(-360))
-
-    # Define the duration of each time slot
-    duration = timedelta(minutes=15)
-
-    # Define the number of clients you can serve at the same time
-    num_clients = 2
-
-    # Loop through each day in event_list
-    for day in event_list:
-        date = list(day.keys())[0]
-        events = day[date]
-        start_datetime = datetime.combine(date, start_time)
-        end_datetime = datetime.combine(date, end_time)
-
-        # Add two available slots at the beginning of the day if there are no events yet
-        if not events:
-            for i in range(num_clients):
-                slot_start = start_datetime + i * duration
-                slot_end = slot_start + duration
-                events.append(["available", slot_start, slot_end])
-
-        # Add one available slot at the beginning of the day if there is only one event
-        elif len(events) == 1:
-            first_event = events[0]
-            if first_event[1] > start_datetime:
-                for i in range(num_clients):
-                    slot_start = start_datetime + i * duration
-                    slot_end = slot_start + duration
-                    events.insert(0, ["available", slot_start, slot_end])
-
-        # Add available slots in between events if there is room for them
-        for i in range(len(events) - 1):
-            current_event = events[i]
-            next_event = events[i + 1]
-            if next_event[1] - current_event[2] >= duration:
-                for j in range(num_clients):
-                    slot_start = current_event[2] + j * duration
-                    slot_end = slot_start + duration
-                    events.insert(i + 1, ["available", slot_start, slot_end])
-
-        # Add one available slot at the end of the day if there is only one event
-        if len(events) == 1:
-            last_event = events[0]
-            if last_event[2] < end_datetime:
-                for i in range(num_clients):
-                    slot_start = last_event[2] + i * duration
-                    slot_end = slot_start + duration
-                    events.append(["available", slot_start, slot_end])
-
-        # Add two available slots at the end of the day if there are no events yet
-        elif not events[-1]:
-            for i in range(num_clients):
-                slot_start = end_datetime - (num_clients - i) * duration
-                slot_end = slot_start + duration
-                events[-1] = ["available", slot_start, slot_end]
-                events.append(["available", slot_end, end_datetime])
-
-    return render(request, "appointment/calendarview.html", {"event_list": event_list})
-"""
+            slots[curr_day][f"slot{slot_num}"] = tmp
+            curr_slot += slot_duration
+            slot_num += 1
+    return render(
+        request,
+        "appointment/calendarview.html",
+        {"calendar": slots},
+    )
 
 
 def choose_treatments(request):
