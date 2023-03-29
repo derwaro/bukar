@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 from dateutil.parser import parse
 from urllib.parse import urlencode, quote_plus, parse_qs
 import pytz
+import json
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -106,7 +107,8 @@ def calendarview(request):
     # retrieve the selected treatments from the session and parse them into a dictionary
     # for example:
     # {'t0': ["['Lipo Sin Bisturi', 325, datetime.timedelta(seconds=1800)]"]}
-    selection = parse_qs(request.session.get("selection", {}))
+    selection = json.loads(request.session.get("selection", {}))
+    print(selection)
 
     # retrieve calender from google calendar api
     events_results = (
@@ -190,8 +192,7 @@ def choose_treatments(request):
             for i, t in enumerate(treatments):
                 chosen_treatments["t" + str(i)] = t
 
-            chosen_treatments = urlencode(chosen_treatments, quote_via=quote_plus)
-            request.session["selection"] = chosen_treatments
+            request.session["selection"] = json.dumps(chosen_treatments, default=str)
             return redirect("calendarview")
     else:
         form = ChooseTreatmentsForm()
