@@ -21,7 +21,7 @@
     <tr>
       {% if slot.available == True %}
         <td class="bg-green-400">
-          <a href="#"  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - available</a>
+          <a href="{% url 'book_treatment' chosen_slot=slot.start|date:"Y-m-d\TH-i" %}"  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - available</a>
         </td>
       {% else %}
         <td class="bg-red-300">

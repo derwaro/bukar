@@ -9,4 +9,5 @@ urlpatterns = [
     path(
         "add_choose_treatment/", views.add_choose_treatment, name="add_choose_treatment"
     ),
+    path("book_treatment/<chosen_slot>", views.book_treatment, name="book_treatment"),
 ]

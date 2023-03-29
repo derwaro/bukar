@@ -9,7 +9,7 @@ import os.path
 from dotenv import load_dotenv, find_dotenv
 from zoneinfo import ZoneInfo
 from dateutil.parser import parse
-from urllib.parse import urlencode, quote_plus
+from urllib.parse import urlencode, quote_plus, parse_qs
 import pytz
 
 from google.auth.transport.requests import Request
@@ -103,6 +103,12 @@ def calendarview(request):
 
     slot_duration = timedelta(minutes=30)
 
+    # retrieve the selected treatments from the session and parse them into a dictionary
+    # for example:
+    # {'t0': ["['Lipo Sin Bisturi', 325, datetime.timedelta(seconds=1800)]"]}
+    selection = parse_qs(request.session.get("selection", {}))
+
+    # retrieve calender from google calendar api
     events_results = (
         service.events()
         .list(
@@ -117,68 +123,6 @@ def calendarview(request):
         event_list = []
         return HttpResponse(event_list)
 
-    # print(events)
-    """
-    # prepare blocked slots according to data fetched from calendar API
-    blocked_slots = []
-    for event in events:
-        slot_start = parse(event["start"]["dateTime"])
-        slot_end = parse(event["end"]["dateTime"])
-        curr_slot = slot_start
-        while curr_slot < slot_end:
-            curr_slot = curr_slot.replace(tzinfo=cdmx)
-            tmp = [curr_slot, ["blocked", curr_slot, curr_slot + slot_duration, 0]]
-            blocked_slots.append(tmp)
-            curr_slot += slot_duration
-
-    for slot in blocked_slots:
-        slot[1][3] = blocked_slots.count(slot)
-
-    # prepare all possible slots for the next seven days
-    slots = {}
-    for day in range(0, 8):
-        curr_day_start = timeMin.date() + timedelta(days=day)
-
-        curr_slot = datetime.combine(curr_day_start, day_start.time())
-        curr_slot = curr_slot.replace(tzinfo=cdmx)
-
-        curr_day_end = datetime.combine(curr_day_start, day_end.time())
-        curr_day_end = curr_day_end.replace(tzinfo=cdmx)
-
-        slots[curr_day_start] = []
-        counter = 0
-
-        while curr_slot < curr_day_end:
-
-            curr_slot = curr_slot.replace(tzinfo=cdmx)
-            tmp = [
-                curr_slot,
-                counter,
-                ["available", curr_slot, curr_slot + slot_duration, 0],
-            ]
-            slots[curr_day_start].append(tmp)
-            curr_slot += slot_duration
-            counter += 1
-
-    # consolidate blocked_slots and slots into result
-    for bslot in blocked_slots:
-        if bslot[1][3] >= 2:
-            for oslot in slots[bslot[0].date()]:
-                if bslot[0] == oslot[0]:
-                    # print(f"found! {oslot[0]}")
-                    oslot[2][1] = "blocked"
-
-    dates = []
-    for day, values in slots.items():
-        for value in values:
-            dates.append(value)
-
-    l = []
-    for i in slots.values():
-        l.append(i)
-    l = len(l[0])
-    iterator = range(0, l)
-    """
     # prepare blocked slots according to data fetched from calendar API
     blocked_slots = []
     for event in events:
@@ -224,6 +168,7 @@ def calendarview(request):
             slots[curr_day][f"slot{slot_num}"] = tmp
             curr_slot += slot_duration
             slot_num += 1
+
     return render(
         request,
         "appointment/calendarview.html",
@@ -236,14 +181,18 @@ def choose_treatments(request):
         form = ChooseTreatmentsForm(request.POST)
         if form.is_valid():
             treatments = []
-            for field_name, value in form.cleaned_data.items():
-                if value:
-                    treatments.append([value.name, value.price, value.duration])
-            selection = {"treatments": treatments}
+            print(form.cleaned_data.items())
+            for form_field_name, value in form.cleaned_data.items():
+                treatments.append([value.name, value.price, value.duration])
 
-            print(selection)
-            selection = urlencode(selection, quote_via=quote_plus)
-            return redirect(reverse("calendarview"), selection)
+            chosen_treatments = {}
+
+            for i, t in enumerate(treatments):
+                chosen_treatments["t" + str(i)] = t
+
+            chosen_treatments = urlencode(chosen_treatments, quote_via=quote_plus)
+            request.session["selection"] = chosen_treatments
+            return redirect("calendarview")
     else:
         form = ChooseTreatmentsForm()
     return render(request, "appointment/choose_treatments.html", {"form": form})
@@ -253,3 +202,8 @@ def add_choose_treatment(request):
     form = ChooseTreatmentsForm()
     html = render_to_string("appointment/add_choose_treatment.html", {"form": form})
     return HttpResponse(html)
+
+
+def book_treatment(request, chosen_slot):
+
+    return redirect("book_treatment_success", chosen_slot=chosen_slot)
