@@ -205,6 +205,15 @@ def add_choose_treatment(request):
     return HttpResponse(html)
 
 
-def book_treatment(request, chosen_slot):
+def session_writer(request, chosen_slot, endpoint):
+    request.session["chosen_slot"] = json.dumps(chosen_slot)
+    return redirect(endpoint)
 
-    return redirect("book_treatment_success", chosen_slot=chosen_slot)
+
+def book_treatment(request):
+    chosen_slot = json.loads(request.session.get("chosen_slot", {}))
+    print(f"DATA!!!!!: {chosen_slot}")
+    selection = json.loads(request.session.get("selection", {}))
+    print(f"SELECTION: {selection}")
+    return render(request, book_treatment_success)
+    # return redirect("book_treatment_success", chosen_slot=chosen_slot)
