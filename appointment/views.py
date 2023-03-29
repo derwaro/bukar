@@ -99,9 +99,9 @@ def calendarview(request):
     timeMax_iso = timeMax.isoformat()
 
     day_start = datetime.strptime("08:00", "%H:%M")
-    day_end = datetime.strptime("10:00", "%H:%M")
+    day_end = datetime.strptime("16:00", "%H:%M")
 
-    slot_duration = timedelta(minutes=15)
+    slot_duration = timedelta(minutes=30)
 
     events_results = (
         service.events()

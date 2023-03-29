@@ -2,27 +2,10 @@
 {% extends "appointment/base.html" %}
 
 {% block content %}
-<!--
-<table>
-  <thead>
-    <tr>
-      {% for date in calendar %}
-        <th>{{ date }}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for day, slots in calendar.items %}
-      <tr>
-        {% for slot, details in slots.items %}
-          <td>{{ details.start }} - {{ details.end }}{% if not details.available %} (Blocked){% endif %}</td>
-        {% endfor %}
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
--->
+
+<div class="grid grid-cols-8">
 {% for date in calendar %}
+<div class="col-span-1">
 <table>
   <thead>
     <tr>
@@ -34,18 +17,21 @@
     {% for slot in slots.values %}
     {% if slot.start|date:"Y-m-d" == date %}
     
-    {% if slot.available == "True" %}
-        <div class="bg-green-500">
-      {% else %}
-        <div class="bg-red-500">
-      {% endif %}
+    
     <tr>
-      
-      <td  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}" >{{slot.start|date:"H:i"}} - {{ slot.available }}</td>
+      {% if slot.available == True %}
+        <td class="bg-green-400">
+          <a href="#"  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - available</a>
+        </td>
+      {% else %}
+        <td class="bg-red-300">
+          <a href="#nope" class="pointer-events-none" id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - unavailable</a>
+        </td>
+      {% endif %}
     </tr>
-  </div>
 
     {% endif %}
+
 
     
     
@@ -55,13 +41,12 @@
       
         
   </tbody>
-</table>  
+</table>
+</div>
 {% endfor %}
   
+</div>
 
-<button class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-  Button
-</button>
 
 
 
