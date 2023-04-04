@@ -215,5 +215,41 @@ def book_treatment(request):
     print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))
     print(f"SELECTION: {selection}")
-    return render(request, book_treatment_success)
+
+    # set up json data for api
+    # start time
+    chosen_slot = datetime.strptime(chosen_slot, "%Y-%m-%dT%H-%M")
+    chosen_slot = chosen_slot.replace(tzinfo=cdmx)
+    start_slot = chosen_slot.isoformat()
+    print(start_slot)
+    # end time
+    duration_str = "0:15:00"
+    hours, minutes, seconds = map(int, duration_str.split(":"))
+    duration = datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+
+    # START FROM HERE, calculate end of slot by adding the total of timedelta (needs to be converted from string e.g. "00:15:00") to the start slot
+    # end_slot = chosen_slot +
+    service = setup_service()
+
+    event = {
+        "summary": "Test Appointment",
+        "location": "Calle Test 100, Ciuadad Prueba",
+        "description": "",
+        "start": {
+            "dateTime": "2015-05-28T09:00:00-07:00",
+            "timeZone": "America/Mexico_City",
+        },
+        "end": {
+            "dateTime": "2015-05-28T17:00:00-07:00",
+            "timeZone": "America/Mexico_City",
+        },
+        "attendees": [
+            {"email": "lpage@example.com"},
+            {"email": "sbrin@example.com"},
+        ],
+    }
+
+    event = service.events().insert(calendarId=cid, body=event).execute()
+
+    return render(request, "appointment/book_treatment_success.html")
     # return redirect("book_treatment_success", chosen_slot=chosen_slot)
