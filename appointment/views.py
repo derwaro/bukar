@@ -199,7 +199,7 @@ def choose_treatments(request):
             client_details = list(form.cleaned_data.items())[1:]
 
             request.session["selection"] = json.dumps(chosen_treatments, default=str)
-            request.session["client_details"] = json.dumps(client_details, default=str)
+            request.session["clientDetails"] = json.dumps(client_details, default=str)
 
             return redirect("calendarview")
     else:
@@ -224,6 +224,8 @@ def book_treatment(request):
     print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))
     print(f"SELECTION: {selection}")
+    client_details = json.loads(request.session.get("clientDetails", {}))
+    print(f"CLIENT: {client_details}")
 
     # set up json data for api
     # start time
@@ -232,12 +234,13 @@ def book_treatment(request):
     start_slot = chosen_slot.isoformat()
     print(start_slot)
     # end time
-    duration_str = "0:15:00"
+    duration_str = selection[1]
     hours, minutes, seconds = map(int, duration_str.split(":"))
-    duration = datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+    duration = timedelta(hours=hours, minutes=minutes, seconds=seconds)
 
     # START FROM HERE, calculate end of slot by adding the total of timedelta (needs to be converted from string e.g. "00:15:00") to the start slot
-    # end_slot = chosen_slot +
+    end_slot = chosen_slot + duration
+    print(end_slot)
     service = setup_service()
 
     event = {
@@ -245,11 +248,11 @@ def book_treatment(request):
         "location": "Calle Test 100, Ciuadad Prueba",
         "description": "",
         "start": {
-            "dateTime": "2015-05-28T09:00:00-07:00",
+            "dateTime": "2023-04-10T09:00:00-06:00",
             "timeZone": "America/Mexico_City",
         },
         "end": {
-            "dateTime": "2015-05-28T17:00:00-07:00",
+            "dateTime": "2023-04-10T09:30:00-06:00",
             "timeZone": "America/Mexico_City",
         },
         "attendees": [
