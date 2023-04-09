@@ -182,23 +182,32 @@ def choose_treatments(request):
     if request.method == "POST":
         form = ChooseTreatmentsForm(request.POST)
         if form.is_valid():
-            treatments = []
-            print(form.cleaned_data.items())
-            for form_field_name, value in form.cleaned_data.items():
-                treatments.append([value.name, value.price, value.duration])
+            # treatments = []
+            # print(form.cleaned_data.items())
+            # for form_field_name, value in form.cleaned_data.items():
+            #    treatments.append([value.name, value.price, value.duration])
 
-            chosen_treatments = {}
+            # chosen_treatments = {}
 
-            for i, t in enumerate(treatments):
-                chosen_treatments["t" + str(i)] = t
+            # for i, t in enumerate(treatments):
+            #    chosen_treatments["t" + str(i)] = t
+
+            key, value = list(form.cleaned_data.items())[0]
+            chosen_treatments = [value.name, value.duration, value.price]
+            print(chosen_treatments)
+
+            client_details = list(form.cleaned_data.items())[1:]
 
             request.session["selection"] = json.dumps(chosen_treatments, default=str)
+            request.session["client_details"] = json.dumps(client_details, default=str)
+
             return redirect("calendarview")
     else:
         form = ChooseTreatmentsForm()
     return render(request, "appointment/choose_treatments.html", {"form": form})
 
 
+# STUB, meant to add a new field to the initial form on choose_treatments
 def add_choose_treatment(request):
     form = ChooseTreatmentsForm()
     html = render_to_string("appointment/add_choose_treatment.html", {"form": form})
