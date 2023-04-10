@@ -232,7 +232,6 @@ def book_treatment(request):
     chosen_slot = datetime.strptime(chosen_slot, "%Y-%m-%dT%H-%M")
     chosen_slot = chosen_slot.replace(tzinfo=cdmx)
     start_slot = chosen_slot.isoformat()
-    print(start_slot)
     # end time
     duration_str = selection[1]
     hours, minutes, seconds = map(int, duration_str.split(":"))
@@ -240,28 +239,36 @@ def book_treatment(request):
 
     # START FROM HERE, calculate end of slot by adding the total of timedelta (needs to be converted from string e.g. "00:15:00") to the start slot
     end_slot = chosen_slot + duration
-    print(end_slot)
+    end_slot = end_slot.replace(tzinfo=cdmx)
+    end_slot = end_slot.isoformat()
+
+    # summary string
+    summary = selection[0] + " " + client_details[0][1] + " " + client_details[1][1]
+
+    # setup service instance for api
     service = setup_service()
 
     event = {
-        "summary": "Test Appointment",
-        "location": "Calle Test 100, Ciuadad Prueba",
+        "summary": summary,
+        "location": os.getenv("ADDRESS"),
         "description": "",
         "start": {
-            "dateTime": "2023-04-10T09:00:00-06:00",
+            "dateTime": start_slot,
             "timeZone": "America/Mexico_City",
         },
         "end": {
-            "dateTime": "2023-04-10T09:30:00-06:00",
+            "dateTime": end_slot,
             "timeZone": "America/Mexico_City",
         },
         "attendees": [
-            {"email": "lpage@example.com"},
-            {"email": "sbrin@example.com"},
+            {"email": os.getenv("MAIL_COMPANY")},
+            {"email": client_details[2][1]},
         ],
     }
 
     event = service.events().insert(calendarId=cid, body=event).execute()
+
+    request.session.flush()
 
     return render(request, "appointment/book_treatment_success.html")
     # return redirect("book_treatment_success", chosen_slot=chosen_slot)
