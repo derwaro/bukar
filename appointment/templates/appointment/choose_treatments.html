@@ -2,18 +2,34 @@
 {% extends "appointment/base.html" %}
 
 {% block content %}
-<h1>Choose your desired treatments:</h1>
-
-
-<form method="post">
-{% csrf_token %}
-{% for field in form %}
-<label for="{{ field.id_for_label }}">{{ field.label }}</label>
-{{ field }}<br>
-{% endfor %}
-<!-- <button type="button" hx-get="{% url 'add_choose_treatment' %}" hx-target="#extra-field" hx-swap="afterbegin" hx-trigger="click" hx-boost=".hide-button">Add treatment</button> -->
-<div id="extra-field"></div>
-<button type="submit">Next</button>
-</form>
-
+<div class="flex justify-center items-center">
+    <div class="mx-auto mt-16">
+      <h1>Choose your desired treatment:</h1>
+  
+      <form method="post">
+        {% csrf_token %}
+  
+        <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+        {{ form.name }} {{ form.name.errors }} <br>
+  
+        <label for="{{ form.client_name.id_for_label }}">{{ form.client_name.label }}</label>
+        <input type="text" name="{{ form.client_name.name }}" id="{{ form.client_name.id_for_label }}" class="border border-gray-400 p-2 my-2">
+        {{ form.client_name.errors }} <br>
+  
+        <label for="{{ form.client_surname.id_for_label }}">{{ form.client_surname.label }}</label>
+        <input type="text" name="{{ form.client_surname.name }}" id="{{ form.client_surname.id_for_label }}" class="border border-gray-400 p-2 my-2">
+        {{ form.client_surname.errors }} <br>
+  
+        <label for="{{ form.client_mail.id_for_label }}">{{ form.client_mail.label }}</label>
+        <input type="email" name="{{ form.client_mail.name }}" id="{{ form.client_mail.id_for_label }}" class="border border-gray-400 p-2 my-2">
+        {{ form.client_mail.errors }} <br>
+  
+        <label for="{{ form.client_phone.id_for_label }}">{{ form.client_phone.label }}</label>
+        <input type="tel" name="{{ form.client_phone.name }}" id="{{ form.client_phone.id_for_label }}" class="border border-gray-400 p-2 my-2">
+        {{ form.client_phone.errors }} <br>
+  
+      </form>
+    </div>
+  </div>
+    
 {% endblock content %}

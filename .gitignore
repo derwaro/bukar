@@ -5,3 +5,4 @@ token.json
 *.pyc
 __pycache__/
 jstoolchain/
+node_modules/
