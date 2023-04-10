@@ -1,7 +1,10 @@
 <!-- choose_treatments.html -->
 {% extends "appointment/base.html" %}
 
+
 {% block content %}
+{% load myfilters %}
+
 <div class="flex justify-center items-center">
     <div class="mx-auto mt-16">
       <h1>Choose your desired treatment:</h1>
@@ -10,7 +13,7 @@
         {% csrf_token %}
   
         <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-        {{ form.name }} {{ form.name.errors }} <br>
+        {{ form.name|addclass:"" }} {{ form.name.errors }} <br>
   
         <label for="{{ form.client_name.id_for_label }}">{{ form.client_name.label }}</label>
         <input type="text" name="{{ form.client_name.name }}" id="{{ form.client_name.id_for_label }}" class="border border-gray-400 p-2 my-2">
