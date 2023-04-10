@@ -108,7 +108,7 @@ def calendarview(request):
     # for example:
     # {'t0': ["['Lipo Sin Bisturi', 325, datetime.timedelta(seconds=1800)]"]}
     selection = json.loads(request.session.get("selection", {}))
-    print(selection)
+    # print(selection)
 
     # retrieve calender from google calendar api
     events_results = (
@@ -194,7 +194,7 @@ def choose_treatments(request):
 
             key, value = list(form.cleaned_data.items())[0]
             chosen_treatments = [value.name, value.duration, value.price]
-            print(chosen_treatments)
+            # print(chosen_treatments)
 
             client_details = list(form.cleaned_data.items())[1:]
 
@@ -221,11 +221,11 @@ def session_writer(request, chosen_slot, endpoint):
 
 def book_treatment(request):
     chosen_slot = json.loads(request.session.get("chosen_slot", {}))
-    print(f"DATA!!!!!: {chosen_slot}")
+    # print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))
-    print(f"SELECTION: {selection}")
+    # print(f"SELECTION: {selection}")
     client_details = json.loads(request.session.get("clientDetails", {}))
-    print(f"CLIENT: {client_details}")
+    # print(f"CLIENT: {client_details}")
 
     # set up json data for api
     # start time
