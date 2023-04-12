@@ -121,9 +121,9 @@ def calendarview(request):
         .execute()
     )
     events = events_results.get("items", [])
-    if not events:
-        event_list = []
-        return HttpResponse(event_list)
+    # if not events:
+    #    event_list = []
+    #    return HttpResponse(event_list)
 
     # prepare blocked slots according to data fetched from calendar API
     blocked_slots = []
@@ -268,7 +268,12 @@ def book_treatment(request):
 
     event = service.events().insert(calendarId=cid, body=event).execute()
 
+    # delete session elements
     request.session.flush()
 
-    return render(request, "appointment/book_treatment_success.html")
+    return render(
+        request,
+        "appointment/book_treatment_success.html",
+        client_details=client_details,
+    )
     # return redirect("book_treatment_success", chosen_slot=chosen_slot)

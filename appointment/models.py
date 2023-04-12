@@ -19,4 +19,4 @@ class Treatment(models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return f"{self.name}, {self.duration} minutes"
+        return f"{self.name}, {self.duration} minutes, Precio: {self.price} MXN"
