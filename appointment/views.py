@@ -105,11 +105,11 @@ def calendarview(request):
 
     slot_duration = timedelta(minutes=30)
 
-    # retrieve the selected treatments from the session and parse them into a dictionary
-    # for example:
-    # {'t0': ["['Lipo Sin Bisturi', 325, datetime.timedelta(seconds=1800)]"]}
+    # retrieve the selected treatments from the session and parse them
     selection = json.loads(request.session.get("selection", {}))
-    # print(selection)
+    # example output
+    # treatmentname, duration, price, client_count
+    # ['Hot Stone Massage', '0:15:00', 200, 1]
 
     # retrieve calender from google calendar api
     events_results = (
@@ -198,19 +198,13 @@ def choose_treatments(request):
     if request.method == "POST":
         form = ChooseTreatmentsForm(request.POST)
         if form.is_valid():
-            # treatments = []
-            # print(form.cleaned_data.items())
-            # for form_field_name, value in form.cleaned_data.items():
-            #    treatments.append([value.name, value.price, value.duration])
-
-            # chosen_treatments = {}
-
-            # for i, t in enumerate(treatments):
-            #    chosen_treatments["t" + str(i)] = t
-
             key, value = list(form.cleaned_data.items())[0]
-            chosen_treatments = [value.name, value.duration, value.price]
-            # print(chosen_treatments)
+            chosen_treatments = [
+                value.name,
+                value.duration,
+                value.price,
+                value.client_count,
+            ]
 
             client_details = list(form.cleaned_data.items())[1:]
 
