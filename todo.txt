@@ -3,5 +3,6 @@ X muestra precio en pagina inicial
   prüfen, ob der client count berücksichtigt wird.
 X  quitar domingos
 X  sabado termina dia dos y media
+  translation
 
   API key calendario Claudia
