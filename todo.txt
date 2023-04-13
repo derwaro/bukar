@@ -1,6 +1,7 @@
-mandar cita programada por correo a cliente y a Claudia (claudiaspa4@gmail.com)
-prüfen, ob der client count berücksichtigt wird.
-quitar domingos
-sabado termina dia dos y media
+X muestra precio en pagina inicial
+  mandar cita programada por correo a cliente y a Claudia (claudiaspa4@gmail.com)
+  prüfen, ob der client count berücksichtigt wird.
+  quitar domingos
+  sabado termina dia dos y media
 
-API key calendario Claudia
+  API key calendario Claudia

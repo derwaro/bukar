@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.core.mail import send_mail
 
 from datetime import datetime, timedelta, timezone, time
 import os.path
@@ -96,7 +97,7 @@ def calendarview(request):
     service = setup_service()
     timeMin = datetime.now().astimezone(cdmx)
     timeMin_iso = timeMin.isoformat()
-    timeMax = timeMin + timedelta(days=2)
+    timeMax = timeMin + timedelta(days=7)
     timeMax_iso = timeMax.isoformat()
 
     day_start = datetime.strptime("08:00", "%H:%M")
@@ -117,13 +118,28 @@ def calendarview(request):
             calendarId=cid,
             timeMax=timeMax_iso,
             timeMin=timeMin_iso,
+            showDeleted=True,
         )
         .execute()
     )
     events = events_results.get("items", [])
-    # if not events:
-    #    event_list = []
-    #    return HttpResponse(event_list)
+
+    # check for recurring events in result and add the instances to the events object
+    for event in events:
+        if "recurrence" in event:
+            # Query instances endpoint and get all instances of recurring event
+            instances = (
+                service.events()
+                .instances(
+                    calendarId=cid,
+                    eventId=event["id"],
+                    timeMin=timeMin_iso,
+                    timeMax=timeMax_iso,
+                )
+                .execute()
+            )
+            # Add the instances to the list of events
+            events.extend(instances.get("items", []))
 
     # prepare blocked slots according to data fetched from calendar API
     blocked_slots = []
@@ -274,6 +290,6 @@ def book_treatment(request):
     return render(
         request,
         "appointment/book_treatment_success.html",
-        client_details=client_details,
+        {"client_details": client_details},
     )
     # return redirect("book_treatment_success", chosen_slot=chosen_slot)
