@@ -3,17 +3,21 @@
 {% block content %}
 
 
-<div class="flex justify-center">
-    <div class="w-full lg:w-1/2 px-4">
-        <p>Name: </p>
-        <p>Appointment: </p>
-        <p>Date and Time: </p>
+<div class="mx-auto max-w-screen-md">
+    <div class="flex justify-center">
+        <div class="w-full lg:w-1/2 px-4 text-center">
+            <p>Name: </p>
+            <p>Appointment: </p>
+            <p>Date and Time: </p>
+        </div>
+        <div class="w-full lg:w-1/2 px-4">
+            <p>{{ client_details.0.1 }} {{ client_details.1.1 }}</p>
+            <p></p>
+        </div>
     </div>
-    <div class="w-full lg:w-1/2 px-4">
-        <p>{{ client_details.0.1 }} {{ client_details.1.1 }}</p>
-        <p></p>
-    </div>
-  </div>
+</div>
+
+  
   
 
 

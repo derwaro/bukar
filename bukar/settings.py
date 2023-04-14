@@ -11,9 +11,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os.path
+from dotenv import load_dotenv, find_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# load the .env file
+load_dotenv(find_dotenv())
 
 
 # Quick-start development settings - unsuitable for production
@@ -128,3 +134,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # PhoneNumberField Settings
 PHONENUMBER_DEFAULT_REGION = "MX"
+
+# EMAIL Settings
+EMAIL_HOST = os.getenv("GMAIL_SERVER")
+EMAIL_PORT = os.getenv("GMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("GMAIL_USER")
+EMAIL_HOST_PASSWORD = os.getenv("GMAIL_PASSWORD")
+EMAIL_USE_SSL = True

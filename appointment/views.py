@@ -233,8 +233,10 @@ def book_treatment(request):
     chosen_slot = json.loads(request.session.get("chosen_slot", {}))
     # print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))
+    # e.g. ['Gimnasio Hombro', '0:45:00', 250, 1]
     # print(f"SELECTION: {selection}")
     client_details = json.loads(request.session.get("clientDetails", {}))
+    # e.g. [['client_name', 'Hansi'], ['client_surname', 'Wursti'], ['client_mail', 'hans@example.com'], ['client_phone', '+525512345678']]
     # print(f"CLIENT: {client_details}")
 
     # set up json data for api
@@ -280,6 +282,14 @@ def book_treatment(request):
 
     # delete session elements
     request.session.flush()
+
+    send_mail(
+        f"Your {selection[0]} was booked @ Companyname",  # Subject
+        "Here is the message hör sie oida, weil das is meine Nachricht. Ich bins!",  # Content
+        os.getenv("GMAIL_USER"),  # from
+        [client_details[2][1]],  # to
+        fail_silently=False,
+    )
 
     return render(
         request,
