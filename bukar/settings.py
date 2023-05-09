@@ -141,3 +141,6 @@ EMAIL_PORT = os.getenv("GMAIL_PORT")
 EMAIL_HOST_USER = os.getenv("GMAIL_USER")
 EMAIL_HOST_PASSWORD = os.getenv("GMAIL_PASSWORD")
 EMAIL_USE_SSL = True
+
+# Auth Settings
+LOGIN_REDIRECT_URL = "/admin/"
