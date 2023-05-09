@@ -1,6 +1,7 @@
 venv/
 .env
 credentials.json
+OLDcredentials.json
 token.json
 *.pyc
 __pycache__/
