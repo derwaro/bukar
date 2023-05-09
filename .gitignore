@@ -6,3 +6,4 @@ token.json
 __pycache__/
 jstoolchain/
 node_modules/
+todo.txt
