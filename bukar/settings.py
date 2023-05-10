@@ -145,4 +145,4 @@ EMAIL_USE_SSL = True
 
 # Auth Settings
 LOGIN_REDIRECT_URL = "/admin/"
-LOGOUT_REDIRECT_URL = "/admin/"
+LOGOUT_REDIRECT_URL = "login"
