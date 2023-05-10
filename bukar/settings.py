@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "appointment.apps.AppointmentConfig",
+    "accounts.apps.AccountsConfig",
     "django_htmx",
     "phonenumber_field",
     "django.contrib.admin",
