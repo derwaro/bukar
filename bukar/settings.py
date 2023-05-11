@@ -65,7 +65,9 @@ ROOT_URLCONF = "bukar.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates")
+        ],  # includes top level templates dir. here used for base.html template
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
