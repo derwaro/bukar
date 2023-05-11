@@ -8,7 +8,7 @@ from .forms import RegisterUserForm
 # Create your views here.
 def register(request):
     if request.method == "POST":
-        form = RegisterUserForm()
+        form = RegisterUserForm(request.POST)
         if form.is_valid():
             input = form.cleaned_data
             newuser = User.objects.create_user(
@@ -19,7 +19,7 @@ def register(request):
                 password=input["password"],
             )
             newuser.save()
-            return HttpResponse("SUCCESSFULLY REGISTERED")
+            return redirect("choose_treatments")
     else:
         form = RegisterUserForm()
     return render(request, "accounts/register.html", {"form": form})
