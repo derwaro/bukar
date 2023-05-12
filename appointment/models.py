@@ -3,6 +3,7 @@ from django.db import models
 from django.db import models
 
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -17,6 +18,7 @@ class Treatment(models.Model):
     )
     client_count = models.IntegerField(default=1)
     active = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"{self.name}, {self.duration} minutes, Precio: {self.price} MXN"
+        return f"{self.name}, {self.duration} minutes, Price: {self.price} MXN"
