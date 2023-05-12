@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 from .forms import RegisterUserForm
 
@@ -18,6 +19,11 @@ def register(request):
                 email=input["email"],
                 password=input["password"],
             )
+            # query client group and add to new user
+            client_group = Group.objects.get(name="client")
+            newuser.groups.add(client_group)
+            # set new user to be a staff member
+            newuser.is_staff = True
             newuser.save()
             return redirect("choose_treatments")
     else:
