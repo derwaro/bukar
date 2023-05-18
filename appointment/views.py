@@ -65,7 +65,7 @@ def setup_service():
     return service
 
 
-def setup(request):
+def setup(request, company_name):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -93,7 +93,7 @@ def setup(request):
         return HttpResponse("An error occurred: %s" % error)
 
 
-def calendarview(request):
+def calendarview(request, company_name):
     service = setup_service()
     timeMin = datetime.now().astimezone(cdmx)
     timeMin_iso = timeMin.isoformat()
@@ -187,14 +187,16 @@ def calendarview(request):
             curr_slot += slot_duration
             slot_num += 1
 
+    print(request.session["company_name"])
+
     return render(
         request,
         "appointment/calendarview.html",
-        {"calendar": slots},
+        {"calendar": slots, "request": request},
     )
 
 
-def choose_treatments(request):
+def choose_treatments(request, company_name):
     if request.method == "POST":
         form = ChooseTreatmentsForm(request.POST)
         if form.is_valid():
@@ -211,7 +213,10 @@ def choose_treatments(request):
             request.session["selection"] = json.dumps(chosen_treatments, default=str)
             request.session["clientDetails"] = json.dumps(client_details, default=str)
 
-            return redirect("calendarview")
+            company_name = request.build_absolute_uri().split("/")[-3]
+            request.session["company_name"] = company_name
+
+            return redirect("calendarview", company_name=company_name)
     else:
         form = ChooseTreatmentsForm()
     return render(request, "appointment/choose_treatments.html", {"form": form})
@@ -224,12 +229,12 @@ def add_choose_treatment(request):
     return HttpResponse(html)
 
 
-def session_writer(request, chosen_slot, endpoint):
+def session_writer(request, chosen_slot, endpoint, company_name):
     request.session["chosen_slot"] = json.dumps(chosen_slot)
-    return redirect(endpoint)
+    return redirect(endpoint, company_name=company_name)
 
 
-def book_treatment(request):
+def book_treatment(request, company_name):
     chosen_slot = json.loads(request.session.get("chosen_slot", {}))
     # print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))

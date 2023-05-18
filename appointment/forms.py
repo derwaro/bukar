@@ -5,7 +5,9 @@ from phonenumber_field.formfields import PhoneNumberField
 
 
 class ChooseTreatmentsForm(forms.Form):
-    name = forms.ModelChoiceField(queryset=Treatment.objects.filter(active=True).all())
+    name = forms.ModelChoiceField(
+        queryset=Treatment.objects.filter(active=True).filter().all()
+    )
     client_name = forms.CharField(
         max_length=150,
     )

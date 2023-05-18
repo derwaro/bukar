@@ -1,5 +1,5 @@
 <!-- calendarview.html -->
-{% extends "appointment/base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
@@ -21,7 +21,7 @@
     <tr>
       {% if slot.available == True %}
         <td class="bg-green-400">
-          <a href="{% url 'session_writer' chosen_slot=slot.start|date:"Y-m-d\TH-i" endpoint="book_treatment" %}"  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - available</a>
+          <a href="{% url 'session_writer' chosen_slot=slot.start|date:"Y-m-d\TH-i" endpoint="book_treatment" company_name=request.session.company_name %}"  id="{{ slot.start|date:"Y-m-d" }}T{{ slot.start|date:"H-i" }}">{{slot.start|date:"H:i"}} - available</a>
         </td>
       {% else %}
         <td class="bg-red-300">
@@ -46,6 +46,7 @@
 {% endfor %}
   
 </div>
+<p>{{ request.session.company_name }}</p>
 
 
 
