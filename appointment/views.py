@@ -197,8 +197,13 @@ def calendarview(request, company_name):
 
 
 def choose_treatments(request, company_name):
+    # get company name from url and save to session
+    # e.g. https://example.com/COMPANY/choose_treatments
+    company_name = request.build_absolute_uri().split("/")[-3]
+    request.session["company_name"] = company_name
+
     if request.method == "POST":
-        form = ChooseTreatmentsForm(request.POST)
+        form = ChooseTreatmentsForm(request.POST, company_name=company_name)
         if form.is_valid():
             key, value = list(form.cleaned_data.items())[0]
             chosen_treatments = [
@@ -213,12 +218,9 @@ def choose_treatments(request, company_name):
             request.session["selection"] = json.dumps(chosen_treatments, default=str)
             request.session["clientDetails"] = json.dumps(client_details, default=str)
 
-            company_name = request.build_absolute_uri().split("/")[-3]
-            request.session["company_name"] = company_name
-
             return redirect("calendarview", company_name=company_name)
     else:
-        form = ChooseTreatmentsForm()
+        form = ChooseTreatmentsForm(company_name=company_name)
     return render(request, "appointment/choose_treatments.html", {"form": form})
 
 
