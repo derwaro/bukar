@@ -1,7 +1,7 @@
 from django import forms
 from .models import Treatment
 from django.contrib.auth.models import User
-from accounts.models import ClientSettings
+from accounts.models import ClientSetting
 from django.forms import formset_factory
 from phonenumber_field.formfields import PhoneNumberField
 
@@ -23,7 +23,7 @@ class ChooseTreatmentsForm(forms.Form):
         company_name = kwargs.pop("company_name")
         super().__init__(*args, **kwargs)
         self.fields["name"].queryset = Treatment.objects.filter(
-            user__clientsettings__company_name=company_name, active=True
+            user__clientsetting__company_name=company_name, active=True
         )
 
 

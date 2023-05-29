@@ -1,11 +1,13 @@
 from django.contrib import admin
-from .models import ClientSettings
+from .models import ClientSetting
 
 
 # Register your models here.
-class ClientSettingsAdmin(admin.ModelAdmin):
+
+
+class ClientSettingAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
-        qs = super(ClientSettingsAdmin, self).get_queryset(request)
+        qs = super(ClientSettingAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         return qs.filter(user=request.user)
@@ -16,4 +18,4 @@ class ClientSettingsAdmin(admin.ModelAdmin):
         obj.save()
 
 
-admin.site.register(ClientSettings, ClientSettingsAdmin)
+admin.site.register(ClientSetting, ClientSettingAdmin)

@@ -25,7 +25,7 @@ def register(request):
             # set new user to be a staff member
             newuser.is_staff = True
             newuser.save()
-            return redirect("choose_treatments")
+            return redirect("login")
     else:
         form = RegisterUserForm()
     return render(request, "accounts/register.html", {"form": form})
