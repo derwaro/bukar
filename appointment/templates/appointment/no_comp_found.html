@@ -1,0 +1,17 @@
+<!-- no_comp_found.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+    
+<div class="flex justify-center items-center">
+    <div class="mx-auto mt-16">
+
+<h1>Company not found!</h1>
+<p>We're sorry, the company {{ company_name_slug }} you looked for does not yet exist at bukar.</p>
+<p>If you think otherwise, please revise the spelling of it's name</p>
+<p>Or, if you wish that {{ company_name_slug }} is represented here at bukar, send them an invitation through ...</p>
+
+</div>
+</div>
+
+{% endblock content %}

@@ -20,10 +20,10 @@ class ChooseTreatmentsForm(forms.Form):
     client_phone = PhoneNumberField()
 
     def __init__(self, *args, **kwargs):
-        company_name = kwargs.pop("company_name")
+        company_name_slug = kwargs.pop("company_name_slug")
         super().__init__(*args, **kwargs)
         self.fields["name"].queryset = Treatment.objects.filter(
-            user__clientsetting__company_name=company_name, active=True
+            user__clientsetting__company_name_slug=company_name_slug, active=True
         )
 
 

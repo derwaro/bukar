@@ -22,6 +22,8 @@ from googleapiclient.errors import HttpError
 
 from .forms import ChooseTreatmentsForm, ChooseTreatmentsFormSet
 
+from accounts.models import ClientSetting
+
 
 # load the .env file
 load_dotenv(find_dotenv())
@@ -65,7 +67,7 @@ def setup_service():
     return service
 
 
-def setup(request, company_name):
+def setup(request, company_name_slug):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -93,7 +95,7 @@ def setup(request, company_name):
         return HttpResponse("An error occurred: %s" % error)
 
 
-def calendarview(request, company_name):
+def calendarview(request, company_name_slug):
     service = setup_service()
     timeMin = datetime.now().astimezone(cdmx)
     timeMin_iso = timeMin.isoformat()
@@ -187,7 +189,7 @@ def calendarview(request, company_name):
             curr_slot += slot_duration
             slot_num += 1
 
-    print(request.session["company_name"])
+    print(request.session["company_name_slug"])
 
     return render(
         request,
@@ -196,32 +198,46 @@ def calendarview(request, company_name):
     )
 
 
-def choose_treatments(request, company_name):
+def choose_treatments(request, company_name_slug):
     # get company name from url and save to session
     # e.g. https://example.com/COMPANY/choose_treatments
-    company_name = request.build_absolute_uri().split("/")[-3]
-    request.session["company_name"] = company_name
+    company_name_slug = request.build_absolute_uri().split("/")[-3]
+    list_of_slugs = [entry.company_name_slug for entry in ClientSetting.objects.all()]
+    if company_name_slug in list_of_slugs:
+        request.session["company_name_slug"] = company_name_slug
 
-    if request.method == "POST":
-        form = ChooseTreatmentsForm(request.POST, company_name=company_name)
-        if form.is_valid():
-            key, value = list(form.cleaned_data.items())[0]
-            chosen_treatments = [
-                value.name,
-                value.duration,
-                value.price,
-                value.client_count,
-            ]
+        if request.method == "POST":
+            form = ChooseTreatmentsForm(
+                request.POST, company_name_slug=company_name_slug
+            )
+            if form.is_valid():
+                key, value = list(form.cleaned_data.items())[0]
+                chosen_treatments = [
+                    value.name,
+                    value.duration,
+                    value.price,
+                    value.client_count,
+                ]
 
-            client_details = list(form.cleaned_data.items())[1:]
+                client_details = list(form.cleaned_data.items())[1:]
 
-            request.session["selection"] = json.dumps(chosen_treatments, default=str)
-            request.session["clientDetails"] = json.dumps(client_details, default=str)
+                request.session["selection"] = json.dumps(
+                    chosen_treatments, default=str
+                )
+                request.session["clientDetails"] = json.dumps(
+                    client_details, default=str
+                )
 
-            return redirect("calendarview", company_name=company_name)
+                return redirect("calendarview", company_name_slug=company_name_slug)
+        else:
+            form = ChooseTreatmentsForm(company_name_slug=company_name_slug)
+        return render(request, "appointment/choose_treatments.html", {"form": form})
     else:
-        form = ChooseTreatmentsForm(company_name=company_name)
-    return render(request, "appointment/choose_treatments.html", {"form": form})
+        return render(
+            request,
+            "appointment/no_comp_found.html",
+            {"company_name_slug": company_name_slug},
+        )
 
 
 # STUB, meant to add a new field to the initial form on choose_treatments
@@ -231,12 +247,12 @@ def add_choose_treatment(request):
     return HttpResponse(html)
 
 
-def session_writer(request, chosen_slot, endpoint, company_name):
+def session_writer(request, chosen_slot, endpoint, company_name_slug):
     request.session["chosen_slot"] = json.dumps(chosen_slot)
-    return redirect(endpoint, company_name=company_name)
+    return redirect(endpoint, company_name_slug=company_name_slug)
 
 
-def book_treatment(request, company_name):
+def book_treatment(request, company_name_slug):
     chosen_slot = json.loads(request.session.get("chosen_slot", {}))
     # print(f"DATA!!!!!: {chosen_slot}")
     selection = json.loads(request.session.get("selection", {}))
