@@ -32,7 +32,7 @@ load_dotenv(find_dotenv())
 cdmx = ZoneInfo("America/Mexico_City")
 
 # set up the calendarId fron the .env file
-cid = os.getenv("CALENDAR_ID")
+# id = os.getenv("CALENDAR_ID")
 
 # link up to credentials.json necessary to get token.json file and oauth to Google API
 cred_file = "./credentials.json"
@@ -112,6 +112,13 @@ def calendarview(request, company_name_slug):
     # example output
     # treatmentname, duration, price, client_count
     # ['Hot Stone Massage', '0:15:00', 200, 1]
+
+    # retrieve calendar id from ClientSettings associated with company_name
+    cid = (
+        ClientSetting.objects.filter(company_name_slug=company_name_slug)
+        .first()
+        .calendar_id
+    )
 
     # retrieve calender from google calendar api
     events_results = (
@@ -261,6 +268,13 @@ def book_treatment(request, company_name_slug):
     client_details = json.loads(request.session.get("clientDetails", {}))
     # e.g. [['client_name', 'Hansi'], ['client_surname', 'Wursti'], ['client_mail', 'hans@example.com'], ['client_phone', '+525512345678']]
     # print(f"CLIENT: {client_details}")
+
+    # retrieve calendar id from ClientSettings associated with company_name
+    cid = (
+        ClientSetting.objects.filter(company_name_slug=company_name_slug)
+        .first()
+        .calendar_id
+    )
 
     # set up json data for api
     # start time
