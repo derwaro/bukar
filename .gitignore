@@ -8,3 +8,4 @@ __pycache__/
 jstoolchain/
 node_modules/
 todo.txt
+*.sqlite3
