@@ -3,10 +3,31 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
+import secrets
+
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+
+from appointment.views import setup_service, cdmx, SCOPES
+
 from .forms import RegisterUserForm
 
 
 # Create your views here.
+
+
+def create_calendar(username, email):
+    service = setup_service()
+
+    calendar_list_entry = {"summary": username, "timeZone": cdmx.key}
+
+    created_calendar_list_entry = (
+        service.calendars().insert(body=calendar_list_entry).execute()
+    )
+    calendar_id = created_calendar_list_entry["id"]
+    return calendar_id
+
+
 def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
