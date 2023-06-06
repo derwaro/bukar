@@ -21,6 +21,8 @@ class ClientSetting(models.Model):
         return f"{self.user} with <{self.company_name}> at <{self.company_name_slug}>"
 
     def save(self, *args, **kwargs):
-        self.company_name_slug = slugify(self.company_name)
-        self.calendar_email = self.user.email
+        if not self.company_name_slug:
+            self.company_name_slug = slugify(self.company_name)
+        if not self.calendar_email:
+            self.calendar_email = self.user.email
         super(ClientSetting, self).save(*args, **kwargs)
